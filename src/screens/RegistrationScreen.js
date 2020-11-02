@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import { faUtensils } from '@fortawesome/free-solid-svg-icons'
 import { AuthContext } from "./../providers/AuthProvider";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
-
+import {modelName} from 'expo-device';
 
 export const RegistrationScreen = ({ navigation }) => {
 
@@ -20,12 +20,13 @@ export const RegistrationScreen = ({ navigation }) => {
     }
 
     const onRegisterPress = () => {
+
         const data = {
             name,
             email,
             password,
             password_confirmation: confirmPassword,
-            device_name: "mobile",
+            device_name: modelName ?? 'mobile',
         };
         register(data)
     }
@@ -123,22 +124,24 @@ const styles = StyleSheet.create({
       marginTop: 20,
       height: 48,
       borderRadius: 5,
-      alignItems: "center",
+      alignSelf: 'stretch',
       justifyContent: 'center'
   },
   buttonTitle: {
       color: 'white',
       fontSize: 16,
-      fontWeight: "bold"
+      fontWeight: "normal",
+      textAlign: "center"
   },
   footerView: {
       flex: 1,
-      alignItems: "center",
+      alignSelf: 'stretch',
       marginTop: 20
   },
   footerText: {
       fontSize: 16,
-      color: '#2e2e2d'
+      color: '#2e2e2d',
+      textAlign: 'center',
   },
   footerLink: {
       color: "#788eec",

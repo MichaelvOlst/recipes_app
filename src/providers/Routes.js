@@ -4,15 +4,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AuthContext } from './AuthProvider';
 import { AuthStack } from './../navigation/AuthStack';
 import { AppStack } from './../navigation/AppStack';
-import * as SecureStore from 'expo-secure-store';
+import * as Storage from '../services/storage'
 
 export const Routes = () => {
   const { user, setUser, login, logout } = useContext(AuthContext)
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // check if the user is logged in or not
-    SecureStore.getItemAsync('user')
+   
+    Storage.getKey('user')
       .then(userString => {
         if (userString) {
           // decode it
@@ -26,6 +26,22 @@ export const Routes = () => {
         console.log(err);
         setLoading(false)
       })
+
+    // // check if the user is logged in or not
+    // SecureStore.getItemAsync('user')
+    //   .then(userString => {
+    //     if (userString) {
+    //       // decode it
+    //       // login();
+    //       userObject = JSON.parse(userString)
+    //       setUser(userObject);
+    //     }
+    //     setLoading(false);
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //     setLoading(false)
+    //   })
   }, []);
 
   if (loading) {

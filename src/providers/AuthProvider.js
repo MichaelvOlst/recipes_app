@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
+import {modelName} from 'expo-device';
+import * as Storage from '../services/storage'
+
 
 axios.defaults.baseURL = 'https://recipes.michaelvanolst.dev';
 
@@ -24,9 +26,9 @@ export const AuthProvider = ({children}) => {
             }
             setUser(userResponse);
             setError(null);
+            Storage.setKey('user', userResponse)
           })
           .catch(error => {
-            // console.log(error)
             const key = Object.keys(error.response.data.errors)[0];
             setError(error.response.data.errors[key][0]);
           })
@@ -35,7 +37,7 @@ export const AuthProvider = ({children}) => {
           axios.post('/api/login', {
             email,
             password,
-            device_name: 'mobile',
+            device_name: modelName ?? 'mobile',
           })
           .then(response => {
             const userResponse = {
@@ -43,7 +45,7 @@ export const AuthProvider = ({children}) => {
             }
             setUser(userResponse);
             setError(null);
-            SecureStore.setItemAsync('user', JSON.stringify(userResponse));
+            Storage.setKey('user', userResponse)
           })
           .catch(error => {
             const key = Object.keys(error.response.data.errors)[0];
@@ -56,7 +58,7 @@ export const AuthProvider = ({children}) => {
           axios.post('/api/logout')
           .then(response => {
             setUser(null);
-            SecureStore.deleteItemAsync('user')
+            Storage.deleteKey('user')
           })
           .catch(error => {
             console.log(error.response);

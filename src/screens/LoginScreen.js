@@ -1,16 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, {useContext, useState} from 'react';
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import { faUtensils } from '@fortawesome/free-solid-svg-icons'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import { AuthContext } from "./../providers/AuthProvider";
+
 
 export const LoginScreen = ({ navigation }) => {
+
+  const { login, error } = useContext(AuthContext);
+
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const onFooterLinkPress = () => {
     navigation.navigate("registration")
+  }
+
+  const onLoginPress = () => {
+    login(email, password)
   }
 
   return (
@@ -19,6 +27,7 @@ export const LoginScreen = ({ navigation }) => {
             style={{ flex: 1, width: '100%' }}
             keyboardShouldPersistTaps="always">
             <FontAwesomeIcon icon={faUtensils} size={64} style={styles.logo} />
+            { error && <Text style={{ marginLeft: 30, color: 'red', marginBottom: 24, flex: 1, alignItems: 'center'}}>{ error }</Text> }
 
             <TextInput
                 style={styles.input}
@@ -45,7 +54,7 @@ export const LoginScreen = ({ navigation }) => {
                 <Text style={styles.buttonTitle}>Log in</Text>
             </TouchableOpacity>
             <View style={styles.footerView}>
-                <Text style={styles.footerText}>Don't have an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Sign up</Text></Text>
+                <Text style={styles.footerText}>Don't have an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}> Sign up</Text></Text>
             </View>
         </KeyboardAwareScrollView>
     </View>
@@ -74,14 +83,14 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
       marginTop: 10,
       marginBottom: 10,
-      marginLeft: 30,
-      marginRight: 30,
+      marginLeft: 20,
+      marginRight: 20,
       paddingLeft: 16
   },
   button: {
       backgroundColor: '#788eec',
-      marginLeft: 30,
-      marginRight: 30,
+      marginLeft: 20,
+      marginRight: 20,
       marginTop: 20,
       height: 48,
       borderRadius: 5,
@@ -91,16 +100,17 @@ const styles = StyleSheet.create({
   buttonTitle: {
       color: 'white',
       fontSize: 16,
-      fontWeight: "bold"
+      fontWeight: "normal"
   },
   footerView: {
       flex: 1,
-      alignItems: "center",
+      alignSelf: 'stretch',
       marginTop: 20
   },
   footerText: {
       fontSize: 16,
-      color: '#2e2e2d'
+      color: '#2e2e2d',
+      textAlign: 'center',
   },
   footerLink: {
       color: "#788eec",
