@@ -15,7 +15,7 @@ export const setKey = (key, value) => {
     if(Platform.OS != 'web') {
         return SecureStore.setItemAsync(key, JSON.stringify(value));
     }
-
+    
     return AsyncStorage.setItem(key, JSON.stringify(value))
 }
 

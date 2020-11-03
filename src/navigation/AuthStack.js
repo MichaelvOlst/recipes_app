@@ -1,8 +1,8 @@
 
 import React, { useContext, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { RegistrationScreen } from '../screens/RegistrationScreen';
-import { LoginScreen } from '../screens/LoginScreen';
+import { RegistrationScreen } from '../screens/Auth/RegistrationScreen';
+import { LoginScreen } from '../screens/Auth/LoginScreen';
 
 const Stack = createStackNavigator();
 

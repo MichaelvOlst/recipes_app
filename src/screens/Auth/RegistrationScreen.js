@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import { faUtensils } from '@fortawesome/free-solid-svg-icons'
-import { AuthContext } from "./../providers/AuthProvider";
+import { AuthContext } from "../../providers/AuthProvider";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {modelName} from 'expo-device';
 

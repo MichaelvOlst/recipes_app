@@ -1,54 +1,46 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, Text, View, Button, TextInput, ActivityIndicator, AsyncStorage } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthContext } from './AuthProvider';
 import { AuthStack } from './../navigation/AuthStack';
 import { AppStack } from './../navigation/AppStack';
 import * as Storage from '../services/storage'
+import api, {setClientToken} from '../services/api'
+import { Loading } from "../components/Loading";
 
 export const Routes = () => {
-  const { user, setUser, login, logout } = useContext(AuthContext)
+  const { user, setUser } = useContext(AuthContext)
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-   
-    Storage.getKey('user')
-      .then(userString => {
-        if (userString) {
-          // decode it
-          // login();
-          userObject = JSON.parse(userString)
-          setUser(userObject);
+    Storage.getKey('token')
+      .then(tokenString => {
+        if (tokenString) {
+          const token = JSON.parse(tokenString)
+          setClientToken(token.token)
+          api.get('/api/user/me/')
+          .then(response => {
+            setTimeout(() => {
+              setUser(response.data);
+              setLoading(false);
+            }, 1000)
+          })
+          .catch(error => {
+            setLoading(false);
+            console.log(error.response)
+          })
+        } else {
+          setLoading(false);
         }
-        setLoading(false);
       })
       .catch(err => {
-        console.log(err);
+        // alert(err)
         setLoading(false)
       })
-
-    // // check if the user is logged in or not
-    // SecureStore.getItemAsync('user')
-    //   .then(userString => {
-    //     if (userString) {
-    //       // decode it
-    //       // login();
-    //       userObject = JSON.parse(userString)
-    //       setUser(userObject);
-    //     }
-    //     setLoading(false);
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //     setLoading(false)
-    //   })
   }, []);
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
+      <Loading/>
     )
   }
 

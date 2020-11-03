@@ -1,60 +1,57 @@
 
 import React, { useContext, useState, useEffect } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
 import { AuthContext } from "./../providers/AuthProvider";
 import { Button, Text, View } from "react-native";
-import axios from 'axios';
+import { RecipesList } from "../screens/Recipes/RecipesList";
 
-axios.defaults.baseURL = 'https://recipes.michaelvanolst.dev';
+// const Stack = createStackNavigator();
 
-const Stack = createStackNavigator();
+// function DashboardScreen({ navigation }) {
+//   const { user, logout } = useContext(AuthContext)
+//   const [name, setName] = useState(null);
 
-function DashboardScreen({ navigation }) {
-  const { user, logout } = useContext(AuthContext)
-  const [name, setName] = useState(null);
+//   useEffect(() => {
+//     // console.log(user)
+//     // alert(user.email)
+//   }, [])
+
+
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//       <Text>Dashboard Screen Logged In View</Text>
+//       <Text>User: {user.email}</Text>
+//       <Text>User from Server: {name}</Text>
+//       <Button title="Go to Settings" onPress={() => navigation.navigate('Settings')} />
+//       <Text>User from Server: {name}</Text>
+//       <Button title="Logout" onPress={() => logout()} />
+//     </View>
+//   );
+// }
+
+function logoutScreen({ navigation }) {
+  const { logout } = useContext(AuthContext)
 
   useEffect(() => {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+    logout()
+    navigation.navigate("login")
+  }, [])
 
-    axios.get('/api/users')
-      .then(response => {
-        setName(response.data.name);
-      })
-      .catch(error => {
-        console.log(error.response);
-      })
-
-  }, []);
-
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Dashboard Screen Logged In View</Text>
-      <Text>User: {user.email}</Text>
-      <Text>User from Server: {name}</Text>
-      <Button title="Go to Settings" onPress={() => navigation.navigate('Settings')} />
-      <Button title="Logout" onPress={() => logout()} />
-    </View>
-  );
+  return null
 }
 
-function SettingsScreen({ navigation }) {
-  const { user, logout } = useContext(AuthContext)
-
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Settings Screen</Text>
-      <Text>User: {user.email}</Text>
-      <Button title="Go to Dashboard" onPress={() => navigation.navigate('Dashboard')} />
-      <Button title="Logout" onPress={() => logout()} />
-    </View>
-  );
-}
+const Drawer = createDrawerNavigator();
 
 export const AppStack = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Dashboard" component={DashboardScreen} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-    </Stack.Navigator>
+      <Drawer.Navigator initialRouteName="recipes">
+        <Drawer.Screen name="recipes" options={{ title: 'Recipes' }} component={RecipesList} />
+        <Drawer.Screen name="logout" component={logoutScreen} />
+      </Drawer.Navigator>
+    // <Stack.Navigator>
+    //   <Stack.Screen name="recipes" options={{ title: 'Recipes' }} component={RecipesList} />
+    //   {/* <Stack.Screen name="Settings" component={SettingsScreen} /> */}
+    // </Stack.Navigator>
   )
 }
