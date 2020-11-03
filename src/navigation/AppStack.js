@@ -47,7 +47,7 @@ export const AppStack = () => {
   return (
       <Drawer.Navigator initialRouteName="recipes">
         <Drawer.Screen name="recipes" options={{ title: 'Recipes' }} component={RecipesList} />
-        <Drawer.Screen name="logout" component={logoutScreen} />
+        <Drawer.Screen name="logout" options={{ title: 'Logout' }} component={logoutScreen} />
       </Drawer.Navigator>
     // <Stack.Navigator>
     //   <Stack.Screen name="recipes" options={{ title: 'Recipes' }} component={RecipesList} />
