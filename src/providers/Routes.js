@@ -19,10 +19,10 @@ export const Routes = () => {
           setClientToken(token.token)
           api.get('/api/user/me/')
           .then(response => {
-            setTimeout(() => {
+            // setTimeout(() => {
               setUser(response.data);
               setLoading(false);
-            }, 1000)
+            // }, 1000)
           })
           .catch(error => {
             setLoading(false);

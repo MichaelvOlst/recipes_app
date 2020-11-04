@@ -1,5 +1,5 @@
-import React, {useContext, useRef} from 'react';
-import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, {useContext, useRef, useState} from 'react';
+import {StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import { faUtensils } from '@fortawesome/free-solid-svg-icons'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
@@ -10,8 +10,8 @@ export const LoginScreen = ({ navigation }) => {
 
     const { login, error } = useContext(AuthContext);
 
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const passwordInput = useRef();
 

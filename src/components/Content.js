@@ -1,23 +1,21 @@
 import React from 'react';
 import {StyleSheet,View, TouchableOpacity, Text } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
+import { Header } from 'react-native-elements';
 
 
-export const Content = ({navigation, name, children}) => {
+export const Content = ({navigation, name, children, RightHeaderComponent}) => {
 
   return (
 
     <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-            <View style={styles.headerContent}>
-                <TouchableOpacity onPress={()=>navigation.openDrawer()}>
-                    <Ionicons name="ios-menu" size={32} />
-                </TouchableOpacity>
-                <Text>{name}</Text>
-                <Text style={{width:50}}></Text>
-            </View>
-        </View>
+        <Header containerStyle={{backgroundColor: '#fff'}}>
+            <TouchableOpacity onPress={() => navigation.openDrawer()} >
+                <Ionicons name="ios-menu" size={32} />
+            </TouchableOpacity>                
+            <Text>{name}</Text>
+            {RightHeaderComponent && RightHeaderComponent}
+        </Header>
 
         <View style={styles.content}>
             {children}
@@ -31,16 +29,6 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
     },
-    header: {
-        width:"100%",
-        height:100,
-        // flexDirection:"row",
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        // paddingHorizontal:20,
-        backgroundColor: '#fff',
-        // justifyContent: "space-around"
-    },
     headerContent: {
         flexDirection: 'row',
         padding: 'auto',
@@ -51,6 +39,7 @@ const styles = StyleSheet.create({
         // alignContent: 'center',
     },
     content:{
+        marginTop: 30,
         paddingHorizontal:20,
     },
 });
