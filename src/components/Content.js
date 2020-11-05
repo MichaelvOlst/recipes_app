@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet,View, TouchableOpacity, Text } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from 'react-native-elements';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 export const Content = ({navigation, name, children, RightHeaderComponent}) => {
@@ -16,10 +17,10 @@ export const Content = ({navigation, name, children, RightHeaderComponent}) => {
             <Text>{name}</Text>
             {RightHeaderComponent && RightHeaderComponent}
         </Header>
-
-        <View style={styles.content}>
+        
+        <ScrollView style={styles.content}>
             {children}
-        </View>  
+        </ScrollView>
     </View>
   );
 };
@@ -32,11 +33,6 @@ const styles = StyleSheet.create({
     headerContent: {
         flexDirection: 'row',
         padding: 'auto',
-
-        // justifyContent: "center",
-        // alignItems: 'center',
-        // textAlignVertical: 'center',
-        // alignContent: 'center',
     },
     content:{
         marginTop: 30,
