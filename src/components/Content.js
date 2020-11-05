@@ -1,27 +1,18 @@
 import React from 'react';
-import {StyleSheet,View, TouchableOpacity, Text } from 'react-native'
-import { Ionicons } from '@expo/vector-icons';
-import { Header } from 'react-native-elements';
-import { ScrollView } from 'react-native-gesture-handler';
+import {StyleSheet,View, TouchableOpacity, Text, SafeAreaView } from 'react-native'
 
 
-export const Content = ({navigation, name, children, RightHeaderComponent}) => {
+export const Content = ({header, children}) => {
 
   return (
+    <SafeAreaView>
+        {header && header}
 
-    <View style={styles.container}>
-        <Header containerStyle={{backgroundColor: '#fff'}}>
-            <TouchableOpacity onPress={() => navigation.openDrawer()} >
-                <Ionicons name="ios-menu" size={32} />
-            </TouchableOpacity>                
-            <Text>{name}</Text>
-            {RightHeaderComponent && RightHeaderComponent}
-        </Header>
-        
-        <ScrollView style={styles.content}>
+        <View style={styles.content}>
             {children}
-        </ScrollView>
-    </View>
+        </View>
+        
+    </SafeAreaView>
   );
 };
 
