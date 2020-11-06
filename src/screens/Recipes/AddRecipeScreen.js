@@ -1,8 +1,10 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import { StyleSheet, TextInput, View, Text } from 'react-native'
-import { Button, Appbar } from 'react-native-paper';
+import { Button, Appbar, ActivityIndicator } from 'react-native-paper';
 import {Content} from '../../components/Content';
 import api from '../../services/api';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 export const AddRecipeScreen = ({navigation}) => {
 
@@ -12,15 +14,27 @@ export const AddRecipeScreen = ({navigation}) => {
 
     const urlInput = useRef();
 
+    useFocusEffect(
+        useCallback(() => {
+            const unsubscribe = () => {
+                setTitle('')
+                setURL('')
+            }
+    
+            return () => unsubscribe();
+        }, [])
+    );
+
     const addRecipe = () => {
         setLoading(true)
         api.post('/api/recipes/', {title, url})
             .then(response => {
-                console.log(response.data)
+                // console.log(response.data)
                 setLoading(false)
                 navigation.navigate('Recipes')
             })
             .catch(error => {
+                alert(error.response.data.message)
                 console.log(error.response);
                 setLoading(false)
             })
@@ -33,6 +47,20 @@ export const AddRecipeScreen = ({navigation}) => {
                 <Appbar.Content title="Add recipe" titleStyle={{ color: "#6f6d6d"}} />
             </Appbar.Header>
         );
+    }
+
+    const LoadingButton = () => {
+        return (
+            <View style={styles.button}><ActivityIndicator color="#fff"></ActivityIndicator></View>
+        )
+    }
+
+    const AddButton = () => {
+        return (
+            <Button mode="contained" style={styles.button} onPress={() => addRecipe()}>
+                <Text style={styles.buttonTitle}>Add</Text>
+            </Button>
+        )
     }
 
     return (
@@ -66,9 +94,7 @@ export const AddRecipeScreen = ({navigation}) => {
                     ref={urlInput}
                 />
                 
-                <Button mode="contained" style={styles.button} disabled={loading} onPress={() => addRecipe()}>
-                    <Text style={styles.buttonTitle}>{loading ? 'Working..' : 'Add'}</Text>
-                </Button>
+                {loading ? <LoadingButton/> : <AddButton/>}
             </View>
         </Content>
   );

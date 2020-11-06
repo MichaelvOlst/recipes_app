@@ -1,87 +1,142 @@
-import React, {useEffect, useState} from 'react';
-import { StyleSheet, TouchableOpacity, FlatList, Linking, View, TouchableHighlight } from 'react-native'
+import React from 'react';
+import { StyleSheet, TouchableOpacity, FlatList, Linking, View, TouchableHighlight, RefreshControl } from 'react-native'
 import {Content} from '../../components/Content';
-import {Card, Title, Paragraph, Appbar, Badge } from 'react-native-paper';
+import {Card, Title, Paragraph, Appbar, Badge, Text } from 'react-native-paper';
 import api from '../../services/api';
-import { Loading } from "../../components/Loading";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { useFocusEffect } from '@react-navigation/native';
+export default class RecipesListScreen extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            recipes: [],
+            refreshing: false,
+        };
+    }
+
+    componentDidMount() {
+        this.fetchRecipes()
+    }
+
+    onRefresh() {
+        this.fetchRecipes();
+    }
+
+    // const [recipes, setRecipes] = useState(null)
+    // const [refreshing, setRefreshing] = React.useState(false);
 
 
-export const RecipesListScreen = ({navigation}) => {
-    const [loading, setLoading] = useState(true)
-    const [recipes, setRecipes] = useState(null)
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         const unsubscribe = () => {
+    //             fetchRecipes()
+    //         }
+    //         // alert('hallo')
+    //         fetchRecipes()
+    
+    //         return () => unsubscribe();
+    //     }, [])
+    // );
 
-    React.useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-                setLoading(true)
+    fetchRecipes() {
+        // setRefreshing(true)
+        this.setState({refreshing: true})
         api.get('/api/recipes/')
             .then(response => {
+                console.log(response.data.data)
+                this.setState({recipes: response.data.data})
                 // console.log(response.data.data)
-                setRecipes(response.data.data)
-                // console.log(response.data)
-                setLoading(false)
+                this.setState({refreshing: false})
             })
             .catch(error => {
                 // alert(error.response)
                 console.log(error.response);
-                setLoading(false)
+                // setRefreshing(false)
+                this.setState({refreshing: false})
+
             })
-        });
+    } 
+
+  
     
-        // Return the function to unsubscribe from the event so it gets removed on unmount
-        return unsubscribe;
-    }, [navigation]);
 
-    // useEffect(() => {
-    //     setLoading(true)
-    //     api.get('/api/recipes/')
-    //         .then(response => {
-    //             // console.log(response.data.data)
-    //             setRecipes(response.data.data)
-    //             // console.log(response.data)
-    //             setLoading(false)
-    //         })
-    //         .catch(error => {
-    //             // alert(error.response)
-    //             console.log(error.response);
-    //             setLoading(false)
-    //         })
-    // }, [recipes]);
-
-
-    const openRecipeUrl = async (item) => {
-    
+    openRecipeUrl = async (item) => {
         try {
             Linking.openURL(item.url)
         } catch (error) {
             alert(error)
         }
-    
     }
 
-    const recipeItem = ({ item }) => {
+    likeRecipe = (recipe) => {
+        api.put(`/api/recipes/${recipe.id}/like`)
+            .then(response => {
+                this.setState({
+                    recipes: this.state.recipes.map(item => {
+                      if (recipe.id === item.id) {
+                        return { ...item, likes: response.data.likes }
+                      }
+                      return item;
+                    })
+                });
+            })
+            .catch(error => {
+                // alert(error.response)
+                console.log(error);
+                // setRefreshing(false)
+            })
+    }
+
+   unlikeRecipe = (recipe) => {
+        api.delete(`/api/recipes/${recipe.id}/unlike`)
+        .then(response => {
+            this.setState({
+                recipes: this.state.recipes.map(item => {
+                if (recipe.id === item.id) {
+                    return { ...item, likes: response.data.likes }
+                }
+                return item;
+                })
+            });
+        })
+        .catch(error => {
+            // alert(error.response)
+            console.log(error);
+            // setRefreshing(false)
+        })    
+    }
+
+   recipeItem = ({ item }) => {
 
         return (
             <Card style={styles.container} >
                 <View style={{ flex: 1}}>
                 <Card.Cover style={styles.imageCover} source={{ uri: item.image }} />
                 <Card.Content style={styles.cardContent}>
-                    <Title style={styles.cardContentTitle}>{item.title}</Title>
+                    <View style={styles.cardContentView}>
+                        <Title style={styles.cardContentTitle}>{item.title}</Title>
+                        <Badge size={32} style={{backgroundColor: "#788eec", color: '#fff'}}>{item.likes}</Badge>
+                    </View>
                     <Paragraph>{item.description}</Paragraph>
                 </Card.Content>
                 </View>
                 <Card.Actions style={styles.cardActions}>
                     <View style={styles.cardActionsView}>
-                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => openRecipeUrl(item)}>
-                            <Badge size={32} style={{backgroundColor: "#788eec", color: '#fff'}}>{item.likes}</Badge>  
+                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => this.likeRecipe(item)}>
+                            <MaterialCommunityIcon name="thumb-up" size={32} color="#788eec"></MaterialCommunityIcon>
                         </TouchableHighlight>
-                        <TouchableHighlight style={styles.cardActionsViewItem} 
-                            onPress={() => { navigation.navigate('EditRecipe', {initial: false, recipe: item})}}>
-                            <Icon name="edit" size={32} color="#788eec"></Icon>
+                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => this.unlikeRecipe(item)}>
+                            <MaterialCommunityIcon name="thumb-down-outline" size={32} color="#788eec"></MaterialCommunityIcon>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => { navigation.navigate('EditRecipe', {recipe: item})}}>
+                            <MaterialIcon name="edit" size={32} color="#788eec"></MaterialIcon>
                         </TouchableHighlight>
                         <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => openRecipeUrl(item)}>
-                            <Icon name="open-in-new" size={32} color="#788eec"></Icon>
+                            <MaterialIcon name="open-in-new" size={32} color="#788eec"></MaterialIcon>
                         </TouchableHighlight>
                     </View>
                 </Card.Actions>
@@ -90,11 +145,11 @@ export const RecipesListScreen = ({navigation}) => {
     };
 
 
-    const Header = () => {
+    header = () => {
         return (
             <Appbar.Header style={{paddingLeft: 10, backgroundColor: '#fff'}}>
-                <TouchableOpacity onPress={() => navigation.openDrawer()} >
-                    <Icon name="menu" size={32} color="#788eec"></Icon>
+                <TouchableOpacity onPress={() => this.props.navigation.openDrawer()} >
+                    <MaterialIcon name="menu" size={32} color="#788eec"></MaterialIcon>
                 </TouchableOpacity> 
                 <Appbar.Content title="Recipes" titleStyle={{ color: "#6f6d6d"}} />
                 <Appbar.Action icon="plus" color="#788eec" onPress={() => navigation.navigate('AddRecipe')} />
@@ -103,26 +158,24 @@ export const RecipesListScreen = ({navigation}) => {
     }
 
 
-    if(loading) {
+    render() {
         return (
-            <Loading/>
-        )
-    }
-
-
-    return (
-        <Content name="Recipes" header={<Header/>}>
+        <Content name="Recipes" header={this.header()}>
             <FlatList
                 vertical
                 showsVerticalScrollIndicator={false}
-                data={recipes}
-                renderItem={recipeItem}
+                data={this.state.recipes}
+                extraData={this.state.recipes}
+                renderItem={this.recipeItem}
                 keyExtractor={item => `${item.id}`}
                 style={{marginBottom: 220}}
+                refreshing={this.state.refreshing}
+                onRefresh={this.fetchRecipes.bind(this)}
             />
         </Content>
-  );
-};
+        )
+    }
+}
 
 
 const styles = StyleSheet.create({
@@ -137,8 +190,14 @@ const styles = StyleSheet.create({
         position: 'relative',
         minHeight: 170,
     },
+    cardContentView: {
+        paddingBottom: 20,
+        // flex: 1,
+        flexDirection: 'row',
+        justifyContent: "space-between",
+    },
     cardContentTitle: {
-        paddingBottom: 20
+        
     },
     cardActionsView: {
         borderTopWidth: 1,

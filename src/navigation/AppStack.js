@@ -1,7 +1,7 @@
 
 import React from "react";
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { RecipesListScreen } from "../screens/Recipes/RecipesListScreen";
+import RecipesListScreen from "../screens/Recipes/RecipesListScreen";
 import { DrawerContent } from '../components/DrawerContent';
 import { AddRecipeScreen } from "../screens/Recipes/AddRecipeScreen";
 import { EditRecipeScreen } from "../screens/Recipes/EditRecipeScreen";

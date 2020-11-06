@@ -3,7 +3,7 @@ import { StyleSheet, TextInput, View, Text, ActivityIndicator } from 'react-nati
 import { Button, Appbar } from 'react-native-paper';
 import {Content} from '../../components/Content';
 import api from '../../services/api';
-import { useFocusEffect } from '@react-navigation/native';
+// import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -30,14 +30,15 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
     const updateRecipe = () => {
         setLoading(true)
-        api.post('/api/recipes/', {title, url})
+        api.put(`/api/recipes/${recipe.id}`, {title, url, image, description})
             .then(response => {
                 console.log(response.data)
                 setLoading(false)
                 navigation.navigate('Recipes')
             })
             .catch(error => {
-                console.log(error.response);
+                console.log(error.response.data);
+                alert(error.response.data.message);
                 setLoading(false)
             })
     }
@@ -51,6 +52,19 @@ export const EditRecipeScreen = ({navigation, route}) => {
         );
     }
 
+    const LoadingButton = () => {
+        return (
+            <View style={styles.button}><ActivityIndicator color="#fff"></ActivityIndicator></View>
+        )
+    }
+
+    const UpdateButton = () => {
+        return (
+            <Button mode="contained" style={styles.button} onPress={() => updateRecipe()}>
+                <Text style={styles.buttonTitle}>Update</Text>
+            </Button>
+        )
+    }
     return (
         <Content name="Add Recipe" header={<Header/>}>
             <View style={styles.content}>
@@ -111,10 +125,8 @@ export const EditRecipeScreen = ({navigation, route}) => {
                     onSubmitEditing={() => urlInput.current.focus() }
                     ref={descriptionInput}
                 />
-                
-                <Button mode="contained" style={styles.button} disabled={loading} onPress={() => updateRecipe()}>
-                    {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.buttonTitle}>Upsdate</Text>}
-                </Button>
+
+                {loading ? <LoadingButton/> : <UpdateButton/>}
             </View>
         </Content>
   );
@@ -147,7 +159,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginLeft: 20,
         marginRight: 20,
-        paddingLeft: 16
+        paddingLeft: 16,
+        fontSize: 14,
     },
     button: {
         backgroundColor: '#788eec',
