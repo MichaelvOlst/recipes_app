@@ -132,7 +132,7 @@ export default class RecipesListScreen extends React.Component {
                         <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => this.unlikeRecipe(item)}>
                             <MaterialCommunityIcon name="thumb-down-outline" size={32} color="#788eec"></MaterialCommunityIcon>
                         </TouchableHighlight>
-                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => { navigation.navigate('EditRecipe', {recipe: item})}}>
+                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => { this.props.navigation.navigate('EditRecipe', {recipe: item})}}>
                             <MaterialIcon name="edit" size={32} color="#788eec"></MaterialIcon>
                         </TouchableHighlight>
                         <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => openRecipeUrl(item)}>
@@ -152,7 +152,7 @@ export default class RecipesListScreen extends React.Component {
                     <MaterialIcon name="menu" size={32} color="#788eec"></MaterialIcon>
                 </TouchableOpacity> 
                 <Appbar.Content title="Recipes" titleStyle={{ color: "#6f6d6d"}} />
-                <Appbar.Action icon="plus" color="#788eec" onPress={() => navigation.navigate('AddRecipe')} />
+                <Appbar.Action icon="plus" color="#788eec" onPress={() => this.props.navigation.navigate('AddRecipe')} />
             </Appbar.Header>
         );
     }
