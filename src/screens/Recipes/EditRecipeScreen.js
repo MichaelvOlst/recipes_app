@@ -1,11 +1,9 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { StyleSheet, TextInput, View, Text, ActivityIndicator } from 'react-native'
+import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,PixelRatio } from 'react-native'
 import { Button, Appbar } from 'react-native-paper';
 import {Content} from '../../components/Content';
 import api from '../../services/api';
-// import { useFocusEffect } from '@react-navigation/native';
-
-
+import * as ImagePicker from 'expo-image-picker';
 
 export const EditRecipeScreen = ({navigation, route}) => {
 
@@ -26,6 +24,17 @@ export const EditRecipeScreen = ({navigation, route}) => {
         setURL(recipe.url)
         setImage(recipe.image)
         setDescription(recipe.description)
+
+
+        // (async () => {
+        //     if (Platform.OS !== 'web') {
+        //       const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+        //       if (status !== 'granted') {
+        //         alert('Sorry, we need camera roll permissions to make this work!');
+        //       }
+        //     }
+        // })();
+
     }, [navigation, recipe])
 
     const updateRecipe = () => {
@@ -65,6 +74,23 @@ export const EditRecipeScreen = ({navigation, route}) => {
             </Button>
         )
     }
+    
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.cancelled) {
+          setImage(result.uri);
+        }
+    };
+
+   
     return (
         <Content name="Add Recipe" header={<Header/>}>
             <View style={styles.content}>
@@ -127,6 +153,13 @@ export const EditRecipeScreen = ({navigation, route}) => {
                 />
 
                 {loading ? <LoadingButton/> : <UpdateButton/>}
+
+                <TouchableOpacity onPress={pickImage} style={{marginTop: 50}}>
+                    <View style={styles.avatarContainer}>
+                        <Text>Select a Photo</Text>
+                        {image !== null ? <Image style={styles.avatar} source={{ uri: image }} /> : null }
+                    </View>
+                </TouchableOpacity>
             </View>
         </Content>
   );
@@ -179,5 +212,16 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "normal",
         textAlign: 'center'
+    },
+    avatarContainer: {
+        borderColor: '#9B9B9B',
+        borderWidth: 1 / PixelRatio.get(),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatar: {
+        borderRadius: 75,
+        width: 150,
+        height: 150,
     },
 });
