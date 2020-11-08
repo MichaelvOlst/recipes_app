@@ -22,32 +22,12 @@ export default class RecipesListScreen extends React.Component {
         this.fetchRecipes()
     }
 
-    onRefresh() {
-        this.fetchRecipes();
-    }
-
-    // const [recipes, setRecipes] = useState(null)
-    // const [refreshing, setRefreshing] = React.useState(false);
-
-
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         const unsubscribe = () => {
-    //             fetchRecipes()
-    //         }
-    //         // alert('hallo')
-    //         fetchRecipes()
-    
-    //         return () => unsubscribe();
-    //     }, [])
-    // );
-
     fetchRecipes() {
         // setRefreshing(true)
         this.setState({refreshing: true})
         api.get('/api/recipes/')
             .then(response => {
-                console.log(response.data.data)
+                // console.log(response.data.data)
                 this.setState({recipes: response.data.data})
                 // console.log(response.data.data)
                 this.setState({refreshing: false})
@@ -111,15 +91,14 @@ export default class RecipesListScreen extends React.Component {
     }
 
    recipeItem = ({ item }) => {
-
         return (
             <Card style={styles.container} >
                 <View style={{ flex: 1}}>
                 <Card.Cover style={styles.imageCover} source={{ uri: item.image }} />
                 <Card.Content style={styles.cardContent}>
                     <View style={styles.cardContentView}>
+                        <Badge size={32} style={styles.cardContentBadge} >{item.likes}</Badge>
                         <Title style={styles.cardContentTitle}>{item.title}</Title>
-                        <Badge size={32} style={{backgroundColor: "#788eec", color: '#fff'}}>{item.likes}</Badge>
                     </View>
                     <Paragraph>{item.description}</Paragraph>
                 </Card.Content>
@@ -135,7 +114,7 @@ export default class RecipesListScreen extends React.Component {
                         <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => { this.props.navigation.navigate('EditRecipe', {recipe: item})}}>
                             <MaterialIcon name="edit" size={32} color="#788eec"></MaterialIcon>
                         </TouchableHighlight>
-                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => openRecipeUrl(item)}>
+                        <TouchableHighlight style={styles.cardActionsViewItem} onPress={() => this.openRecipeUrl(item)}>
                             <MaterialIcon name="open-in-new" size={32} color="#788eec"></MaterialIcon>
                         </TouchableHighlight>
                     </View>
@@ -152,6 +131,7 @@ export default class RecipesListScreen extends React.Component {
                     <MaterialIcon name="menu" size={32} color="#788eec"></MaterialIcon>
                 </TouchableOpacity> 
                 <Appbar.Content title="Recipes" titleStyle={{ color: "#6f6d6d"}} />
+                <Appbar.Action icon="refresh" color="#788eec" onPress={() => this.fetchRecipes() } />
                 <Appbar.Action icon="plus" color="#788eec" onPress={() => this.props.navigation.navigate('AddRecipe')} />
             </Appbar.Header>
         );
@@ -159,6 +139,9 @@ export default class RecipesListScreen extends React.Component {
 
 
     render() {
+
+        // this.fetchRecipes()
+
         return (
         <Content name="Recipes" header={this.header()}>
             <FlatList
@@ -192,12 +175,20 @@ const styles = StyleSheet.create({
     },
     cardContentView: {
         paddingBottom: 20,
+        position: 'relative',
         // flex: 1,
         flexDirection: 'row',
         justifyContent: "space-between",
     },
     cardContentTitle: {
-        
+        width: '80%'
+    },
+    cardContentBadge: {
+        backgroundColor: '#788eec',
+        color: '#fff',
+        top: 5,
+        right: 5,
+        position: 'absolute',
     },
     cardActionsView: {
         borderTopWidth: 1,
