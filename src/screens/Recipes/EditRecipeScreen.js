@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,PixelRatio } from 'react-native'
+import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,PixelRatio, Platform } from 'react-native'
 import { Button, Appbar } from 'react-native-paper';
 import {Content} from '../../components/Content';
 import api from '../../services/api';
@@ -12,11 +12,13 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const [loading, setLoading] = useState(false)
     const [title, setTitle] = useState('')
     const [url, setURL] = useState('')
-    const [image, setImage] = useState('')
+    const [image, setImage] = useState(null)
     const [description, setDescription] = useState('')
+    const [imageBase64, setImageBase64] = useState(null)
+    const [web, setWeb] = useState(false)
 
     const urlInput = useRef();
-    const imageInput = useRef();
+    // const imageInput = useRef();
     const descriptionInput = useRef();
 
     useEffect( () => {
@@ -24,6 +26,7 @@ export const EditRecipeScreen = ({navigation, route}) => {
         setURL(recipe.url)
         setImage(recipe.image)
         setDescription(recipe.description)
+
 
 
         // (async () => {
@@ -39,15 +42,15 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
     const updateRecipe = () => {
         setLoading(true)
-        api.put(`/api/recipes/${recipe.id}`, {title, url, image, description})
+        api.put(`/api/recipes/${recipe.id}`, {title, url, description, image, imageBase64, web})
             .then(response => {
                 console.log(response.data)
                 setLoading(false)
                 navigation.navigate('Recipes')
             })
             .catch(error => {
-                console.log(error.response.data);
-                alert(error.response.data.message);
+                console.log(error.response);
+                // alert(error.response.data.message);
                 setLoading(false)
             })
     }
@@ -79,14 +82,24 @@ export const EditRecipeScreen = ({navigation, route}) => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
           allowsEditing: true,
+        //   allowsMultipleSelection: true,
           aspect: [4, 3],
           quality: 1,
+        //   exif: true,
+          base64: true,
         });
     
-        console.log(result);
-    
         if (!result.cancelled) {
-          setImage(result.uri);
+            // console.log(result)
+            if(Platform.OS == 'web') {
+                setImageBase64(result.uri);
+                setImage(result.uri);
+                setWeb(true);
+                return
+            }
+            
+            setImageBase64(result.base64);
+            setImage(result.uri);
         }
     };
 
@@ -94,6 +107,14 @@ export const EditRecipeScreen = ({navigation, route}) => {
     return (
         <Content name="Add Recipe" header={<Header/>}>
             <View style={styles.content}>
+
+                <TouchableOpacity onPress={pickImage} style={{marginTop: 50}}>
+                    <View style={styles.avatarContainer}>
+                        <Text>Select a Photo</Text>
+                        {image && <Image style={styles.avatar} source={{ uri: image }} /> }
+                    </View>
+                </TouchableOpacity>
+
                 <TextInput
                     style={styles.input} 
                     placeholder='Title'
@@ -105,10 +126,10 @@ export const EditRecipeScreen = ({navigation, route}) => {
                     autofocus={true}
                     blurOnSubmit={true}
                     returnKeyType="next"
-                    onSubmitEditing={() => imageInput.current.focus() }
+                    onSubmitEditing={() => urlInput.current.focus() }
                 />
 
-                <TextInput
+                {/* <TextInput
                     style={styles.input} 
                     placeholder='Image URL'
                     placeholderTextColor="#aaaaaa"
@@ -120,7 +141,7 @@ export const EditRecipeScreen = ({navigation, route}) => {
                     returnKeyType="next"
                     onSubmitEditing={() => urlInput.current.focus() }
                     ref={imageInput}
-                />
+                /> */}
 
                 <TextInput
                     style={styles.input}
@@ -153,13 +174,6 @@ export const EditRecipeScreen = ({navigation, route}) => {
                 />
 
                 {loading ? <LoadingButton/> : <UpdateButton/>}
-
-                <TouchableOpacity onPress={pickImage} style={{marginTop: 50}}>
-                    <View style={styles.avatarContainer}>
-                        <Text>Select a Photo</Text>
-                        {image !== null ? <Image style={styles.avatar} source={{ uri: image }} /> : null }
-                    </View>
-                </TouchableOpacity>
             </View>
         </Content>
   );
