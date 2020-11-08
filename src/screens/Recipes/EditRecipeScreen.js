@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,PixelRatio, Platform } from 'react-native'
+import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,Dimensions, Platform } from 'react-native'
 import { Button, Appbar } from 'react-native-paper';
 import {Content} from '../../components/Content';
 import api from '../../services/api';
@@ -109,11 +109,12 @@ export const EditRecipeScreen = ({navigation, route}) => {
             <View style={styles.content}>
 
                 <TouchableOpacity onPress={pickImage} style={{marginTop: 50}}>
-                    <View style={styles.avatarContainer}>
-                        <Text>Select a Photo</Text>
-                        {image && <Image style={styles.avatar} source={{ uri: image }} /> }
-                    </View>
+                    <Text>Select an image</Text>
                 </TouchableOpacity>
+
+                <View style={styles.avatarContainer}>
+                    {image && <Image style={styles.avatar}  source={{ uri: image }} /> }
+                </View>
 
                 <TextInput
                     style={styles.input} 
@@ -228,14 +229,29 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     avatarContainer: {
-        borderColor: '#9B9B9B',
-        borderWidth: 1 / PixelRatio.get(),
+        // flex: 1,
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        // backgroundColor: '#F5FCFF',
+        // position: 'relative'
+        // borderColor: '#9B9B9B',
+        // borderWidth: 1 / PixelRatio.get(),
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 20,
     },
     avatar: {
-        borderRadius: 75,
-        width: 150,
-        height: 150,
+        // width: 300,
+        height: 300,
+        width: (Dimensions.get('window').width - 40),
+        // height: (Dimensions.get('window').width / 2) * Dimensions.get('window').height / (Dimensions.get('window').width/ 2)
+        // width: 150,
+        // height: 150,
+        // flex: 1,
+        // position: 'absolute',
+        // top: 0,
+        // left: 0,
+        // bottom: 0,
+        // right: 0,
     },
 });
