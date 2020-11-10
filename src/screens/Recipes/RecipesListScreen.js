@@ -19,7 +19,11 @@ export default class RecipesListScreen extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchRecipes()
+        
+
+        this.props.navigation.addListener('focus', () => {
+            this.fetchRecipes()
+        });
     }
 
     fetchRecipes() {
@@ -41,8 +45,6 @@ export default class RecipesListScreen extends React.Component {
             })
     } 
 
-  
-    
 
     openRecipeUrl = async (item) => {
         try {
@@ -51,6 +53,7 @@ export default class RecipesListScreen extends React.Component {
             alert(error)
         }
     }
+
 
     likeRecipe = (recipe) => {
         api.put(`/api/recipes/${recipe.id}/like`)
@@ -71,7 +74,8 @@ export default class RecipesListScreen extends React.Component {
             })
     }
 
-   unlikeRecipe = (recipe) => {
+
+    unlikeRecipe = (recipe) => {
         api.delete(`/api/recipes/${recipe.id}/unlike`)
         .then(response => {
             this.setState({
@@ -90,7 +94,13 @@ export default class RecipesListScreen extends React.Component {
         })    
     }
 
-   recipeItem = ({ item }) => {
+
+    refresh = () => {
+        alert('refresh')
+    }
+
+
+    recipeItem = ({ item }) => {
         return (
             <Card style={styles.container} >
                 <View style={{ flex: 1}}>
@@ -137,10 +147,11 @@ export default class RecipesListScreen extends React.Component {
         );
     }
 
-
     render() {
 
-        // this.fetchRecipes()
+        // if(this.props.route.params?.forceUpdate) {
+        //     this.fetchRecipes()
+        // }
 
         return (
         <Content name="Recipes" header={this.header()}>
