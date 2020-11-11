@@ -19,8 +19,6 @@ export default class RecipesListScreen extends React.Component {
     }
 
     componentDidMount() {
-        
-
         this.props.navigation.addListener('focus', () => {
             this.fetchRecipes()
         });

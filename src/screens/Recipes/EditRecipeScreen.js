@@ -1,10 +1,12 @@
 import React, {useState, useRef, useEffect} from 'react';
-import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,Dimensions, Platform, Alert } from 'react-native'
+import { StyleSheet, TextInput, View, Text, ActivityIndicator, TouchableOpacity,Image,Dimensions, Platform, Alert, ScrollView } from 'react-native'
 import { Button, Appbar } from 'react-native-paper';
 import {Content} from '../../components/Content';
 import api from '../../services/api';
 import * as ImagePicker from 'expo-image-picker';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import DropDownPicker from 'react-native-dropdown-picker';
+import Icon from 'react-native-vector-icons/Feather';
 
 export const EditRecipeScreen = ({navigation, route}) => {
 
@@ -17,6 +19,9 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const [description, setDescription] = useState('')
     const [imageBase64, setImageBase64] = useState(null)
     const [web, setWeb] = useState(false)
+    const [categories, setCategories] = useState(recipe.categories)
+    const [dropdownPicker, setDropdownPicker] = useState(false)
+
 
     const urlInput = useRef();
     // const imageInput = useRef();
@@ -152,7 +157,7 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const ImageContainer = () => {
         return (
             <View style={styles.avatarContainer}>
-                <TouchableOpacity onPress={pickImage} style={{marginTop: 50}}>
+                <TouchableOpacity onPress={pickImage} >
                     <Image style={styles.avatar}  source={{ uri: image }} />
                 </TouchableOpacity>
 
@@ -172,9 +177,10 @@ export const EditRecipeScreen = ({navigation, route}) => {
         )
     }
 
+
     return (
         <Content name="Add Recipe" header={<Header/>}>
-            <View style={styles.content}>
+            <ScrollView containerStyle={styles.content}>
 
                 {image ? <ImageContainer/> : <PickImageButton/>}
 
@@ -222,8 +228,30 @@ export const EditRecipeScreen = ({navigation, route}) => {
                     ref={descriptionInput}
                 />
 
+                <DropDownPicker
+                    items={[
+                        {label: 'UK', value: 'uk', icon: () => <Icon name="flag" size={18} color="#900" />},
+                        {label: 'France', value: 'france', icon: () => <Icon name="flag" size={18} color="#900" />},
+                    ]}
+
+                    multiple={true}
+                    multipleText="%d items have been selected."
+                    min={0}
+                    max={10}
+                    defaultValue={categories}
+                    containerStyle={{height: 40, marginBottom: dropdownPicker ? 100 : 10, width: '100%'}} 
+                    // {[styles.text, touched && invalid ? styles.textinvalid : styles.textvalid]}
+                    itemStyle={{
+                        justifyContent: 'flex-start',
+                    }}
+                    onOpen={() => setDropdownPicker(true)}
+                    onClose={() => setDropdownPicker(false)}
+                    dropDownStyle={{marginTop: 2}}
+                    onChangeItem={item => setCategories(item) }
+                />
+
                 {loading ? <LoadingButton/> : <UpdateAndDeleteButton/>}
-            </View>
+            </ScrollView>
         </Content>
   );
 };
@@ -232,6 +260,7 @@ const styles = StyleSheet.create({
     content: {
         alignItems: 'center',
         justifyContent: 'center',
+        marginBottom: 40,
     },
     input: {
         height: 48,
@@ -241,7 +270,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginTop: 10,
         marginBottom: 10,
-        marginLeft: 20,
+        // marginLeft: 20,
         marginRight: 20,
         paddingLeft: 16
     },
@@ -253,7 +282,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginTop: 10,
         marginBottom: 10,
-        marginLeft: 20,
+        // marginLeft: 20,
         marginRight: 20,
         paddingLeft: 16,
         fontSize: 14,
