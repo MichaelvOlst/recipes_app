@@ -74,7 +74,7 @@ export default class CategoriesListScreen extends React.Component {
     categoryItem = ({ item }) => {
         return (
             <View style={styles.itemContainer}>
-                <Text style={styles.itemContainerTitle}>{item.title}</Text>
+                <Text style={styles.itemContainerTitle}>{item.title} ({item.recipes_count})</Text>
                 <View style={styles.itemContainerButtons}>
                     <TouchableHighlight style={styles.itemButton} onPress={() => { this.props.navigation.navigate('EditCategory', {category: item})}}>
                         <MaterialIcon name="edit" size={24} color="#788eec"></MaterialIcon>
