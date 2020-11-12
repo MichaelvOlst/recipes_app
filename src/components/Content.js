@@ -1,12 +1,12 @@
 import React from 'react';
-import {StyleSheet,View, TouchableOpacity, Text, SafeAreaView } from 'react-native'
+import { StyleSheet,View, SafeAreaView } from 'react-native'
 
 
 export const Content = ({header, children}) => {
 
   return (
     <SafeAreaView>
-        {header && header}
+        {header}
 
         <View style={styles.content}>
             {children}

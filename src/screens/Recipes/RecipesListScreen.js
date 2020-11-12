@@ -1,12 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, FlatList, Linking, View, TouchableHighlight, RefreshControl } from 'react-native'
+import { StyleSheet, TouchableOpacity, FlatList, Linking, View, TouchableHighlight } from 'react-native'
 import {Content} from '../../components/Content';
 import {Card, Title, Paragraph, Appbar, Badge, Text } from 'react-native-paper';
 import api from '../../services/api';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { useFocusEffect } from '@react-navigation/native';
 export default class RecipesListScreen extends React.Component {
 
     constructor(props) {
@@ -29,17 +28,12 @@ export default class RecipesListScreen extends React.Component {
         this.setState({refreshing: true})
         api.get('/api/recipes/')
             .then(response => {
-                // console.log(response.data.data)
                 this.setState({recipes: response.data.data})
-                // console.log(response.data.data)
                 this.setState({refreshing: false})
             })
             .catch(error => {
-                // alert(error.response)
                 console.log(error.response);
-                // setRefreshing(false)
                 this.setState({refreshing: false})
-
             })
     } 
 
@@ -66,9 +60,7 @@ export default class RecipesListScreen extends React.Component {
                 });
             })
             .catch(error => {
-                // alert(error.response)
                 console.log(error);
-                // setRefreshing(false)
             })
     }
 
@@ -86,15 +78,8 @@ export default class RecipesListScreen extends React.Component {
             });
         })
         .catch(error => {
-            // alert(error.response)
             console.log(error);
-            // setRefreshing(false)
         })    
-    }
-
-
-    refresh = () => {
-        alert('refresh')
     }
 
 

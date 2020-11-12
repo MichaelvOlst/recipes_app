@@ -6,7 +6,6 @@ import api from '../../services/api';
 import * as ImagePicker from 'expo-image-picker';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DropDownPicker from 'react-native-dropdown-picker';
-import Icon from 'react-native-vector-icons/Feather';
 
 export const EditRecipeScreen = ({navigation, route}) => {
 
@@ -19,9 +18,9 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const [description, setDescription] = useState('')
     const [imageBase64, setImageBase64] = useState(null)
     const [web, setWeb] = useState(false)
-    const [categories, setCategories] = useState(recipe.categories)
-    const [dropdownPicker, setDropdownPicker] = useState(false)
-
+    const [selectedCategories, setSelectedCategories] = useState(recipe.categories)
+    const [dropdownPickerOpen, setDropdownPickerOpen] = useState(false)
+    const [categories, setCategories] = useState([])
 
     const urlInput = useRef();
     // const imageInput = useRef();
@@ -32,18 +31,34 @@ export const EditRecipeScreen = ({navigation, route}) => {
         setURL(recipe.url)
         setImage(recipe.image)
         setDescription(recipe.description)
+
+        fetchCategories()
+
     }, [navigation, recipe])
+
+    const fetchCategories = () => {
+        api.get('/api/categories/')
+        .then(response => {
+
+            let categories = response.data.data.map((category) => {
+                return {label: category.title, value: category.id}
+            });
+            setCategories(categories)
+        })
+        .catch(error => {
+            alert(error.response.data)
+            console.log(error.response);
+        })
+    }
 
     const updateRecipe = () => {
         setLoading(true)
         api.put(`/api/recipes/${recipe.id}`, {title, url, description, image, imageBase64, web})
             .then(response => {
-                // console.log(response.data)
                 setLoading(false)
                 navigation.navigate('Recipes')
             })
             .catch(error => {
-                // console.log(error.response);
                 alert(error.response.data.message);
                 setLoading(false)
             })
@@ -77,15 +92,12 @@ export const EditRecipeScreen = ({navigation, route}) => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
           allowsEditing: true,
-        //   allowsMultipleSelection: true,
           aspect: [4, 3],
           quality: 1,
-        //   exif: true,
           base64: true,
         });
     
         if (!result.cancelled) {
-            // console.log(result)
             if(Platform.OS == 'web') {
                 setImageBase64(result.uri);
                 setImage(result.uri);
@@ -142,7 +154,6 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
 
     const deleteRecipe = () => {
-
         api.delete(`/api/recipes/${recipe.id}`)
         .then(() => {
             navigation.navigate('Recipes')
@@ -179,7 +190,7 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
 
     return (
-        <Content name="Add Recipe" header={<Header/>}>
+        <Content name="Edit Recipe" header={<Header/>}>
             <ScrollView containerStyle={styles.content}>
 
                 {image ? <ImageContainer/> : <PickImageButton/>}
@@ -229,25 +240,20 @@ export const EditRecipeScreen = ({navigation, route}) => {
                 />
 
                 <DropDownPicker
-                    items={[
-                        {label: 'UK', value: 'uk', icon: () => <Icon name="flag" size={18} color="#900" />},
-                        {label: 'France', value: 'france', icon: () => <Icon name="flag" size={18} color="#900" />},
-                    ]}
-
+                    items={categories}
                     multiple={true}
                     multipleText="%d items have been selected."
                     min={0}
                     max={10}
-                    defaultValue={categories}
-                    containerStyle={{height: 40, marginBottom: dropdownPicker ? 100 : 10, width: '100%'}} 
-                    // {[styles.text, touched && invalid ? styles.textinvalid : styles.textvalid]}
+                    defaultValue={selectedCategories}
+                    containerStyle={{height: 40, marginBottom: dropdownPickerOpen ? 100 : 10, width: '100%'}} 
                     itemStyle={{
                         justifyContent: 'flex-start',
                     }}
-                    onOpen={() => setDropdownPicker(true)}
-                    onClose={() => setDropdownPicker(false)}
+                    onOpen={() => setDropdownPickerOpen(true)}
+                    onClose={() => setDropdownPickerOpen(false)}
                     dropDownStyle={{marginTop: 2}}
-                    onChangeItem={item => setCategories(item) }
+                    onChangeItem={item => setSelectedCategories(item) }
                 />
 
                 {loading ? <LoadingButton/> : <UpdateAndDeleteButton/>}
@@ -270,7 +276,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginTop: 10,
         marginBottom: 10,
-        // marginLeft: 20,
         marginRight: 20,
         paddingLeft: 16
     },
@@ -282,7 +287,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginTop: 10,
         marginBottom: 10,
-        // marginLeft: 20,
         marginRight: 20,
         paddingLeft: 16,
         fontSize: 14,
@@ -295,7 +299,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
         height: 48,
         borderRadius: 5,
-        // alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'stretch',
     },
@@ -306,19 +309,11 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     avatarContainer: {
-        // flex: 1,
-        // justifyContent: 'center',
-        // alignItems: 'center',
-        // backgroundColor: '#F5FCFF',
-        // position: 'relative'
-        // borderColor: '#9B9B9B',
-        // borderWidth: 1 / PixelRatio.get(),
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
     },
     avatar: {
-        // width: 300,
         height: 300,
         width: (Dimensions.get('window').width - 40),
     },

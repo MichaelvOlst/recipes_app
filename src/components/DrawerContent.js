@@ -24,13 +24,25 @@ export function DrawerContent(props) {
                         <DrawerItem 
                             icon={({color, size}) => (
                                 <Icon 
-                                    name="format-list-checkbox" 
+                                    name="food-fork-drink" 
                                     color={color}
                                     size={size}
                                 />
                             )}
                             label="Recipes"
                             onPress={() => {props.navigation.navigate('Recipes')}}
+                        />
+
+                        <DrawerItem 
+                            icon={({color, size}) => (
+                                <Icon 
+                                    name="format-list-checkbox" 
+                                    color={color}
+                                    size={size}
+                                />
+                            )}
+                            label="Categories"
+                            onPress={() => {props.navigation.navigate('Categories')}}
                         />
                         {/* <DrawerItem 
                             icon={({color, size}) => (
