@@ -18,7 +18,7 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const [description, setDescription] = useState('')
     const [imageBase64, setImageBase64] = useState(null)
     const [web, setWeb] = useState(false)
-    const [selectedCategories, setSelectedCategories] = useState(recipe.categories)
+    const [selectedCategories, setSelectedCategories] = useState([])
     const [dropdownPickerOpen, setDropdownPickerOpen] = useState(false)
     const [categories, setCategories] = useState([])
 
@@ -27,10 +27,21 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const descriptionInput = useRef();
 
     useEffect( () => {
+
+        // fetchCategories()
+
         setTitle(recipe.title)
         setURL(recipe.url)
         setImage(recipe.image)
         setDescription(recipe.description)
+
+        // console.log(recipe)
+
+
+        let allSelectedCategories = recipe.categories.map(({title, id}) => {
+            return id
+        });
+        setSelectedCategories(allSelectedCategories);
 
         fetchCategories()
 
@@ -39,15 +50,14 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const fetchCategories = () => {
         api.get('/api/categories/')
         .then(response => {
-
-            let categories = response.data.data.map((category) => {
-                return {label: category.title, value: category.id}
-            });
-            setCategories(categories)
+            let allCategories = response.data.data.map(({title, id}) => {
+                return {label: title, value: id}
+            })
+            setCategories(allCategories)
         })
         .catch(error => {
-            alert(error.response.data)
-            console.log(error.response);
+            // alert(error.response.data)
+            console.log(error);
         })
     }
 
@@ -195,6 +205,29 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
                 {image ? <ImageContainer/> : <PickImageButton/>}
 
+                {categories.length ? <DropDownPicker
+                    items={categories}
+                    defaultValue={selectedCategories}
+                    multiple={true}
+                    placeholder="Select a category"
+                    multipleText="%d categories are selected."
+                    min={0}
+                    max={10}
+                    containerStyle={{height: 40, marginBottom: dropdownPickerOpen ? 130 : 10, width: '100%'}} 
+                    itemStyle={{
+                        justifyContent: 'flex-start',
+                    }}
+                    onChangeList={(items, callback) => {
+                        new Promise((resolve) => resolve(setCategories(items)))
+                            .then(() => callback())
+                            .catch(() => {});
+                      }}
+                    onOpen={() => setDropdownPickerOpen(true)}
+                    onClose={() => setDropdownPickerOpen(false)}
+                    dropDownStyle={{marginTop: 2}}
+                    onChangeItem={item => setSelectedCategories(item) }
+                /> : null}
+
                 <TextInput
                     style={styles.input} 
                     placeholder='Title'
@@ -237,23 +270,6 @@ export const EditRecipeScreen = ({navigation, route}) => {
                     numberOfLines={4}
                     onSubmitEditing={() => urlInput.current.focus() }
                     ref={descriptionInput}
-                />
-
-                <DropDownPicker
-                    items={categories}
-                    multiple={true}
-                    multipleText="%d items have been selected."
-                    min={0}
-                    max={10}
-                    defaultValue={selectedCategories}
-                    containerStyle={{height: 40, marginBottom: dropdownPickerOpen ? 100 : 10, width: '100%'}} 
-                    itemStyle={{
-                        justifyContent: 'flex-start',
-                    }}
-                    onOpen={() => setDropdownPickerOpen(true)}
-                    onClose={() => setDropdownPickerOpen(false)}
-                    dropDownStyle={{marginTop: 2}}
-                    onChangeItem={item => setSelectedCategories(item) }
                 />
 
                 {loading ? <LoadingButton/> : <UpdateAndDeleteButton/>}

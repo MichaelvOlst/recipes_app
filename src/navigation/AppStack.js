@@ -13,7 +13,7 @@ const Drawer = createDrawerNavigator();
 
 export const AppStack = () => {
   return (
-    <Drawer.Navigator initialRouteName="Categories" drawerContent={props => <DrawerContent {...props} />}>
+    <Drawer.Navigator initialRouteName="Recipes" drawerContent={props => <DrawerContent {...props} />}>
       <Drawer.Screen name="Recipes" options={{ headerShown: false }} component={RecipesListScreen} />
       <Drawer.Screen name="AddRecipe" options={{ headerShown: false }} component={AddRecipeScreen} />
       <Drawer.Screen name="EditRecipe" options={{ headerShown: false }} component={EditRecipeScreen} />
