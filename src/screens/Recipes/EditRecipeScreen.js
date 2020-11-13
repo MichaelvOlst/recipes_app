@@ -17,7 +17,6 @@ export const EditRecipeScreen = ({navigation, route}) => {
     const [image, setImage] = useState(null)
     const [description, setDescription] = useState('')
     const [imageBase64, setImageBase64] = useState(null)
-    const [web, setWeb] = useState(false)
     const [selectedCategories, setSelectedCategories] = useState([])
     const [dropdownPickerOpen, setDropdownPickerOpen] = useState(false)
     const [categories, setCategories] = useState([])
@@ -63,7 +62,7 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
     const updateRecipe = () => {
         setLoading(true)
-        api.put(`/api/recipes/${recipe.id}`, {title, url, description, image, imageBase64, web})
+        api.put(`/api/recipes/${recipe.id}`, {title, url, description, categories: selectedCategories})
             .then(response => {
                 setLoading(false)
                 navigation.navigate('Recipes')
@@ -109,22 +108,40 @@ export const EditRecipeScreen = ({navigation, route}) => {
     
         if (!result.cancelled) {
             if(Platform.OS == 'web') {
-                setImageBase64(result.uri);
-                setImage(result.uri);
-                setWeb(true);
+                updateImage(result, true)
                 return
             }
             
-            setImageBase64(result.base64);
-            setImage(result.uri);
+            setTimeout(()=> {
+                updateImage(result, false)
+            }, 1000)
         }
     };
+
+
+    const updateImage = (pickerResult, web) => {
+    
+        setLoading(true);
+
+        setImageBase64(pickerResult.base64);
+        setImage(pickerResult.uri);
+    
+        api.put(`/api/recipes/${recipe.id}/image`, {image: pickerResult.uri, imageBase64: pickerResult.base64, web: web})
+            .then(response => {
+                setLoading(false)                
+                // navigation.navigate('Recipes')
+            })
+            .catch(error => {
+                alert(error.response.data.message);
+                setLoading(false)
+            })
+
+    }
 
     const deleteImageAlert = () => {
         if(Platform.OS == 'web') {
             if(confirm('Do you really want to delete the image?')) {
-                setImageBase64(null);
-                setImage(null);
+                deleteImage();
             }
         } 
         Alert.alert("Delete", "Do you really want to delete the image?",[
@@ -134,13 +151,27 @@ export const EditRecipeScreen = ({navigation, route}) => {
             },
             { 
                 text: "Delete", onPress: () => {
-                    setImageBase64(null);
-                    setImage(null);
+                    deleteImage();
                 } 
             }
         ], { cancelable: false } );   
     }
 
+
+    const deleteImage = () => {
+        
+        setLoading(true)
+        api.delete(`/api/recipes/${recipe.id}/image`)
+            .then(response => {
+                setLoading(false)
+                setImageBase64(null);
+                setImage(null);
+            })
+            .catch(error => {
+                alert(error.response.data.message);
+                setLoading(false)
+            })
+    }
 
     const deleteRecipeAlert = () => {
 
@@ -210,10 +241,10 @@ export const EditRecipeScreen = ({navigation, route}) => {
                     defaultValue={selectedCategories}
                     multiple={true}
                     placeholder="Select a category"
-                    multipleText="%d categories are selected."
+                    multipleText="%d categorie(s) selected."
                     min={0}
                     max={10}
-                    containerStyle={{height: 40, marginBottom: dropdownPickerOpen ? 130 : 10, width: '100%'}} 
+                    containerStyle={{height: 50, marginBottom: dropdownPickerOpen ? 130 : 10, width: '100%'}} 
                     itemStyle={{
                         justifyContent: 'flex-start',
                     }}
@@ -293,7 +324,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         marginRight: 20,
-        paddingLeft: 16
+        paddingLeft: 16,
+        paddingRight: 16,
     },
     textarea: {
         lineHeight: 25,
@@ -305,6 +337,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginRight: 20,
         paddingLeft: 16,
+        paddingRight: 16,
         fontSize: 14,
     },
     button: {

@@ -132,12 +132,11 @@ export default class RecipesListScreen extends React.Component {
 
     render() {
 
-        // if(this.props.route.params?.forceUpdate) {
-        //     this.fetchRecipes()
-        // }
-
         return (
         <Content name="Recipes" header={this.header()}>
+
+            <Text>Hier wil ik een dropdown</Text>
+
             <FlatList
                 vertical
                 showsVerticalScrollIndicator={false}
