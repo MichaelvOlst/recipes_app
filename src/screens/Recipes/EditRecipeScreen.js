@@ -27,15 +27,10 @@ export const EditRecipeScreen = ({navigation, route}) => {
 
     useEffect( () => {
 
-        // fetchCategories()
-
         setTitle(recipe.title)
         setURL(recipe.url)
         setImage(recipe.image)
         setDescription(recipe.description)
-
-        // console.log(recipe)
-
 
         let allSelectedCategories = recipe.categories.map(({title, id}) => {
             return id
@@ -55,7 +50,6 @@ export const EditRecipeScreen = ({navigation, route}) => {
             setCategories(allCategories)
         })
         .catch(error => {
-            // alert(error.response.data)
             console.log(error);
         })
     }

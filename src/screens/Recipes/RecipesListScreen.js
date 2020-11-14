@@ -5,6 +5,7 @@ import {Card, Title, Paragraph, Appbar, Badge, Text } from 'react-native-paper';
 import api from '../../services/api';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Picker} from '@react-native-picker/picker';
 
 export default class RecipesListScreen extends React.Component {
 
@@ -13,6 +14,8 @@ export default class RecipesListScreen extends React.Component {
 
         this.state = {
             recipes: [],
+            categories: null,
+            currentCategory: '',
             refreshing: false,
         };
     }
@@ -21,12 +24,18 @@ export default class RecipesListScreen extends React.Component {
         this.props.navigation.addListener('focus', () => {
             this.fetchRecipes()
         });
+
+        this.fetchCategories()
     }
 
-    fetchRecipes() {
-        // setRefreshing(true)
+    fetchRecipes(currentCategory) {
         this.setState({refreshing: true})
-        api.get('/api/recipes/')
+
+        let category = currentCategory ? `?category=${currentCategory}` : '';
+
+        console.log(currentCategory)
+
+        api.get(`/api/recipes${category}`)
             .then(response => {
                 this.setState({recipes: response.data.data})
                 this.setState({refreshing: false})
@@ -35,7 +44,18 @@ export default class RecipesListScreen extends React.Component {
                 console.log(error.response);
                 this.setState({refreshing: false})
             })
-    } 
+    }
+
+
+    fetchCategories() {
+        api.get('/api/categories/')
+        .then(response => {
+            this.setState({categories: response.data.data})
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 
 
     openRecipeUrl = async (item) => {
@@ -135,7 +155,25 @@ export default class RecipesListScreen extends React.Component {
         return (
         <Content name="Recipes" header={this.header()}>
 
-            <Text>Hier wil ik een dropdown</Text>
+            {this.state.categories 
+                ?   <Picker
+                        selectedValue={this.state.currentCategory}
+                        style={{height: 50, width: '100%', marginBottom: 20, borderRadius: 5, backgroundColor: '#fff', paddingLeft: 20}}
+                        onValueChange={(itemValue, itemIndex) => {
+                            this.setState({currentCategory: itemValue})
+                            this.fetchRecipes(itemValue)
+                        } }>
+                        <Picker.Item label="All recipes" value="" />
+                        {
+                            this.state.categories.map( ({id, title}) => {
+                                return <Picker.Item key={id} label={title} value={id} />
+                            })       
+                        }             
+                    </Picker>
+                :   null
+            }
+
+            
 
             <FlatList
                 vertical
