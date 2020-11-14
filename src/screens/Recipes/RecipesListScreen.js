@@ -174,18 +174,20 @@ export default class RecipesListScreen extends React.Component {
             }
 
             
-
-            <FlatList
-                vertical
-                showsVerticalScrollIndicator={false}
-                data={this.state.recipes}
-                extraData={this.state.recipes}
-                renderItem={this.recipeItem}
-                keyExtractor={item => `${item.id}`}
-                style={{marginBottom: 220}}
-                refreshing={this.state.refreshing}
-                onRefresh={this.fetchRecipes.bind(this)}
-            />
+            {this.state.recipes.length ? 
+                <FlatList
+                    vertical
+                    showsVerticalScrollIndicator={false}
+                    data={this.state.recipes}
+                    extraData={this.state.recipes}
+                    renderItem={this.recipeItem}
+                    keyExtractor={item => `${item.id}`}
+                    style={{marginBottom: 220}}
+                    refreshing={this.state.refreshing}
+                    onRefresh={this.fetchRecipes.bind(this)}
+                />
+                : <Text style={{ textAlign: 'center', justifyContent: 'center', fontSize: 18, marginTop: 20}}> {this.state.refreshing ? '' : 'No recipes found'}</Text>
+            }
         </Content>
         )
     }
@@ -221,7 +223,7 @@ const styles = StyleSheet.create({
         right: 5,
         position: 'absolute',
     },
-    cardActionsView: {
+    cardActionsView: { 
         borderTopWidth: 1,
         borderTopColor: '#f4f4f4',
         flex: 1,
